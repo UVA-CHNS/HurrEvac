@@ -17,6 +17,8 @@ import math
 import re
 import shutil
 import textwrap
+import zipfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pandas as pd
@@ -244,6 +246,87 @@ def sheet_name_for(event_name, year):
     return "{} {}".format(year, re.sub(r"^\s*Hurricane\s+|\s*\(\d{4}\)\s*$", "", event_name))
 
 
+NS_MAIN = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+NS_REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+NS_PKG = "http://schemas.openxmlformats.org/package/2006/relationships"
+DRAWING_REL = NS_REL + "/drawing"
+DRAWING_CT = "application/vnd.openxmlformats-officedocument.drawing+xml"
+
+
+def _sheet_part(z, name_key):
+    """Path of the worksheet part whose sheet name normalises to name_key, inside the open zip z."""
+    wb = ET.fromstring(z.read("xl/workbook.xml"))
+    rels = {r.get("Id"): r.get("Target") for r in ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))}
+    for sh in wb.find("{%s}sheets" % NS_MAIN):
+        if re.sub(r"[^a-z0-9]", "", sh.get("name").lower()) == name_key:
+            t = rels[sh.get("{%s}id" % NS_REL)]
+            return t.lstrip("/") if t.startswith("/") else "xl/" + t
+    return None
+
+
+def _rels_path(part):
+    d, f = part.rsplit("/", 1)
+    return "{}/_rels/{}.rels".format(d, f)
+
+
+def restore_readme_drawing(out_path, source_path):
+    """openpyxl drops drawing objects; the README text lives in a text box, so copy it back from the source workbook."""
+    with zipfile.ZipFile(source_path) as src:
+        sp = _sheet_part(src, "readme")
+        rp = _rels_path(sp)
+        if sp is None or rp not in src.namelist():
+            return False
+        target = [r.get("Target") for r in ET.fromstring(src.read(rp)) if r.get("Type") == DRAWING_REL]
+        if not target:
+            return False
+        dpath = "xl/" + target[0].replace("../", "") if not target[0].startswith("/") else target[0].lstrip("/")
+        if _rels_path(dpath) in src.namelist():
+            print("  WARNING: README drawing has its own relationships (images?); not restored")
+            return False
+        drawing = src.read(dpath)
+
+    with zipfile.ZipFile(out_path) as z:
+        files = {n: z.read(n) for n in z.namelist()}
+        part = _sheet_part(z, "readme")
+    n = 1
+    while "xl/drawings/drawing{}.xml".format(n) in files:
+        n += 1
+    new = "xl/drawings/drawing{}.xml".format(n)
+    files[new] = drawing
+
+    rp = _rels_path(part)
+    rid = "rIdReadmeDrawing"
+    if rp in files:
+        rels = files[rp].decode("utf-8")
+        rels = rels.replace("</Relationships>", '<Relationship Id="{}" Type="{}" Target="/{}"/></Relationships>'.format(rid, DRAWING_REL, new))
+    else:
+        rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="{}">'
+                '<Relationship Id="{}" Type="{}" Target="/{}"/></Relationships>').format(NS_PKG, rid, DRAWING_REL, new)
+    files[rp] = rels.encode("utf-8")
+
+    sheet = files[part].decode("utf-8")
+    if "xmlns:r=" not in sheet.split(">", 1)[0]:
+        sheet = sheet.replace("<worksheet ", '<worksheet xmlns:r="{}" '.format(NS_REL), 1)
+    tag = '<drawing r:id="{}"/>'.format(rid)
+    for anchor in ("<legacyDrawing", "<tableParts", "<extLst"):      # drawing must come before these elements
+        if anchor in sheet:
+            sheet = sheet.replace(anchor, tag + anchor, 1)
+            break
+    else:
+        sheet = sheet.replace("</worksheet>", tag + "</worksheet>")
+    files[part] = sheet.encode("utf-8")
+
+    ct = files["[Content_Types].xml"].decode("utf-8")
+    ct = ct.replace("</Types>", '<Override PartName="/{}" ContentType="{}"/></Types>'.format(new, DRAWING_CT))
+    files["[Content_Types].xml"] = ct.encode("utf-8")
+
+    with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("[Content_Types].xml", files.pop("[Content_Types].xml"))
+        for name, data in files.items():
+            z.writestr(name, data)
+    return True
+
+
 def export_workbooks(events, xlsx_path, out_dir):
     import openpyxl
     norm = lambda s: re.sub(r"[^a-z0-9]", "", s.lower())
@@ -260,7 +343,9 @@ def export_workbooks(events, xlsx_path, out_dir):
         for ws in list(wb.worksheets):
             if ws.title not in keep:
                 wb.remove(ws)
-        wb.save(out_dir / "workbooks" / (ev["file"].replace(".json", ".xlsx")))
+        out_file = out_dir / "workbooks" / (ev["file"].replace(".json", ".xlsx"))
+        wb.save(out_file)
+        restore_readme_drawing(out_file, xlsx_path)
     if missing:
         print("  WARNING: no workbook sheet found for:", missing)
     return missing
