@@ -2,6 +2,8 @@
 
 This is a web application for visualizing evacuation orders issued for hurricanes that impacted the US from 2014 onwards. The site is static (plain HTML, CSS and JavaScript, with [Plotly.js](https://plotly.com/javascript/) drawing the map). The last update is on Nov 23rd, 2026.
 
+The live dashboard can be viewed at: https://uva-chns.github.io/HurrEvac/
+
 ## Instructions for running locally
 
 The website itself only needs the `docs` folder. The Python environment in steps 2-3 is needed only to rebuild the data (see "Adding new hurricane evacuation data").
