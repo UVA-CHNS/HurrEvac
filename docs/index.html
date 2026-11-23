@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HEvOD - Home</title>
+  <script>
+    (function () {
+      var t = 'light';
+      try { t = localStorage.getItem('hevod-theme') || 'light'; } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/hevod.css">
+</head>
+<body data-page="home">
+<div id="app-shell" class="app-shell">
+<main class="hv-main">
+<div class="hv-page">
+  <h2 class="hv-h2 text-center">Home</h2>
+  <hr>
+  <section class="hv-section">
+    <h3 class="hv-h3 text-center">Welcome to HEvOD: Hurricane Evacuation Order Database</h3>
+    <div class="hv-lead">
+      <p>HEvOD is a comprehensive and standardized database of evacuation orders issued by state and local
+      government officials in response to the hurricanes that impacted the United States from 2014 and
+      onwards. The database features a detailed archive of evacuation orders at the county level
+      collected from multiple sources, including official websites and social media accounts of local and
+      state governments and government agencies, as well as news platforms. Corresponding to each evacuation
+      order, the database includes information on the type of the order (mandatory or voluntary), the announcement
+      date and time of the order, the effective date and time of the order, and the areas that were the target
+      of the order for evacuation. The database also includes information regarding the State of Emergency as
+      declared by the governors in response to the events.</p>
+    </div>
+    <p class="hv-lead">Please reach out to the project lead,
+      <a href="https://engineering.virginia.edu/faculty/majid-shafiee-jood" target="_blank" rel="noopener" style="text-decoration:none">Dr. Majid Shafiee-Jood</a>
+      (<a href="mailto:ms2dm@virginia.edu">ms2dm@virginia.edu</a>)
+      if you have inquiries, questions, suggestions, or feedback.</p>
+  </section>
+
+  <section class="hv-section">
+    <h3 class="hv-h3 text-center">Contributions and Acknowledgements</h3>
+    <p class="hv-lead">HEvOD was developed by
+      <a href="https://harsh-anand.live/" target="_blank" rel="noopener" style="text-decoration:none">Harsh Anand</a>
+      under the supervision of
+      <a href="https://engineering.virginia.edu/faculty/majid-shafiee-jood" target="_blank" rel="noopener" style="text-decoration:none">Dr. Majid Shafiee-Jood</a>
+      and
+      <a href="https://engineering.virginia.edu/faculty/negin-alemazkoor" target="_blank" rel="noopener" style="text-decoration:none">Dr. Negin Alemazkoor</a>
+      at the University of Virginia. We also acknowledge the efforts of &lt;NAMES&gt;.</p>
+    <h5 class="hv-h5">Cite HEvOD (APA)</h5>
+    <div class="hv-citation">
+      <p id="citation-text" class="mb-2">Anand, H., Alemazkoor, N., &amp; Shafiee-Jood, M. (2023). HEvOD: Hurricane Evacuation Order Database (Version 1) [Data set]. University of Virginia Dataverse. https://doi.org/10.18130/V3/ZGS4T4</p>
+      <button id="copy-citation" type="button" class="hv-btn hv-btn-sm">Copy citation</button>
+      <span id="copy-citation-msg" class="hv-copy-msg"></span>
+      <div class="hv-citation-link"><a href="https://doi.org/10.18130/V3/ZGS4T4" target="_blank" rel="noopener">https://doi.org/10.18130/V3/ZGS4T4</a></div>
+    </div>
+  </section>
+
+  <div class="hv-tiles">
+    <div>
+      <h4 class="hv-h4 text-center">Data Download</h4>
+      <hr>
+      <a href="downloads.html"><img src="assets/Download.PNG" alt="Go to the Data Download page" class="hv-tile-img"></a>
+    </div>
+    <div>
+      <h4 class="hv-h4 text-center">Dashboard</h4>
+      <hr>
+      <a href="dashboard.html" target="_blank"><img src="assets/Dashboard.PNG" alt="Open the Dashboard" class="hv-tile-img"></a>
+    </div>
+  </div>
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>

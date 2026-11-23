@@ -1,0 +1,7 @@
+# only needed to rebuild the data (pipeline/); the website itself needs no Python
+pandas>=2.0,<3
+numpy
+pyarrow
+openpyxl
+beautifulsoup4
+notebook

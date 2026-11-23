@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HEvOD - Dashboard</title>
+  <script>
+    (function () {
+      var t = 'light';
+      try { t = localStorage.getItem('hevod-theme') || 'light'; } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/hevod.css">
+</head>
+<body data-page="dashboard">
+<div id="app-shell" class="app-shell">
+<main class="hv-main">
+<div class="dash-stage">
+  <div class="map-wrap"><div id="map-graph" class="map-graph" style="height:100%;width:100%"></div></div>
+
+  <div id="hv-controls" class="overlay overlay-tl">
+    <div class="hv-field">
+      <label class="form-label ov-text" for="event-select">Select the Event:</label>
+      <select id="event-select" class="form-select hv-select hv-select-ov"></select>
+    </div>
+    <div class="hv-slider-block">
+      <div class="hv-slider-title">
+        <span id="slider-title" class="ov-text">Public Advisories Time (Current Timezone: EDT)</span>
+        <label class="hv-tz">
+          <span class="hv-tz-label">Change timezone</span>
+          <select id="tz-select" class="form-select hv-select hv-select-ov hv-select-sm"></select>
+        </label>
+      </div>
+      <div class="hv-range-wrap">
+        <input id="pad-slider" class="hv-range" type="range" min="0" max="0" step="1" value="0">
+        <div id="slider-labels" class="hv-ticks"></div>
+      </div>
+      <div id="slider-caption" class="hv-caption ov-text"></div>
+    </div>
+  </div>
+
+  <a id="nhc-btn" class="hv-btn overlay overlay-tr" href="#" target="_blank" rel="noopener">National Hurricane Center Graphics Archive</a>
+
+  <details id="hv-legend" class="overlay overlay-bl hv-legend" open>
+    <summary class="hv-legend-title">Legend</summary>
+    <div id="legend-body"></div>
+  </details>
+</div>
+</main>
+</div>
+<script src="assets/vendor/plotly.min.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>
